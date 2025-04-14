@@ -1,0 +1,4 @@
+admin,admin123,Admin
+librarian,librarian123,Librarian
+reader,reader123,Reader
+chicken,123,Reader

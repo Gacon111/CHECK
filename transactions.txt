@@ -1,0 +1,1 @@
+reader [ BORROW ] Title: Book1 | ISBN: ISBN001 | Date: 2025-04-14
