@@ -50,20 +50,11 @@ class Admin extends User {
             System.out.print("Enter your choice: ");
             choice = sc.nextInt();
             switch (choice) {
-                case 1:
-                    addUser(sc);
-                    break;
-                case 2:
-                    removeUser(sc);
-                    break;
-                case 3:
-                    listUsers();
-                    break;
-                case 4:
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("Invalid choice, please try again.");
+                case 1 -> addUser(sc);
+                case 2 -> removeUser(sc);
+                case 3 -> listUsers();
+                case 4 -> System.exit(0);
+                default -> System.out.println("Invalid choice, please try again.");
             }
         }
         while (choice != 4);
@@ -212,20 +203,11 @@ class Librarian extends User {
             System.out.print("Enter your choice: ");
             choice = sc.nextInt();
             switch (choice) {
-                case 1:
-                    addBook(sc);
-                    break;
-                case 2:
-                    removeBook(sc);
-                    break;
-                case 3:
-                    listBooks();
-                    break;
-                case 4:
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("Invalid choice, please try again.");
+                case 1 -> addBook(sc);
+                case 2 -> removeBook(sc);
+                case 3 -> listBooks();
+                case 4 -> System.exit(0);
+                default -> System.out.println("Invalid choice, please try again.");
             }
         }
         while (choice != 4);
@@ -263,12 +245,7 @@ class Librarian extends User {
             System.out.print("Enter Genre: ");
             Genre = sc.nextLine().trim();
         } while (Genre.isEmpty());
-    
-        do {
-            System.out.print("Enter ISBN: ");
-            Isbn = sc.nextLine().trim();
-        } 
-        while (Isbn.isEmpty());
+        Isbn = generateNextIsbn();
     
         try {
             FileWriter filewriter = new FileWriter("books.txt", true);
@@ -307,12 +284,42 @@ class Librarian extends User {
                 filewriter.write("EBook," + Title + "," + Author + "," + Genre + "," + Isbn + ",true," + fileFormat + "\n");
             }
             filewriter.close();
-            System.out.println("New book ''" + Title + "'' has been added! (Type: " + (type.equals("1") ? "Printed Book" : "EBook") + ")");
+            System.out.println("New book ''" + Title + "'' has been added! (Type: " + (type.equals("1") ? "Printed Book" : "EBook") + ", ISBN: " + Isbn + ")");
     
         } 
         catch (IOException e) {
             System.out.println("Cannot add book: " + e.getMessage());
         }
+    }
+    
+    private String generateNextIsbn() {
+        Set<Integer> existingIsbnNumbers = new TreeSet<>();
+        int maxIsbnNumber = 0;
+    
+        try (Scanner fileScanner = new Scanner(new File("books.txt"))) {
+            while (fileScanner.hasNextLine()) {
+                String[] parts = fileScanner.nextLine().split(",");
+                if (parts.length >= 5 && parts[4].startsWith("ISBN")) {
+                    try {
+                        int currentIsbnNumber = Integer.parseInt(parts[4].substring(4)); // Extract number after "ISBN"
+                        existingIsbnNumbers.add(currentIsbnNumber);
+                        if (currentIsbnNumber > maxIsbnNumber) {
+                            maxIsbnNumber = currentIsbnNumber;
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid ISBN format: " + parts[4]);
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Error occurred while reading file: " + e.getMessage());
+        }
+        for (int i = 1; i <= maxIsbnNumber; i++) {
+            if (!existingIsbnNumbers.contains(i)) {
+                return "ISBN" + String.format("%03d", i);
+            }
+        }
+        return "ISBN" + String.format("%03d", maxIsbnNumber + 1);
     }
 
     public void removeBook(Scanner sc) {
@@ -371,17 +378,17 @@ class Librarian extends User {
     
                 String type = data[0];
     
-                if (type.equals("PrintedBook")) {
-                    String available = data[5];
-                    if (available.equals("true")) {
-                        System.out.println("Title: " + data[1] + ", Author: " + data[2] + ", Genre: " + data[3]
-                            + ", ISBN: " + data[4] + ", Pages: " + data[6]);
+                switch (type) {
+                    case "PrintedBook" -> {
+                        String available = data[5];
+                        if (available.equals("true")) {
+                            System.out.println("Title: " + data[1] + ", Author: " + data[2] + ", Genre: " + data[3]
+                                    + ", ISBN: " + data[4] + ", Pages: " + data[6]);
+                        }
                     }
-                } else if (type.equals("EBook")) {
-                    System.out.println("Title: " + data[1] + ", Author: " + data[2] + ", Genre: " + data[3]
-                        + ", ISBN: " + data[4] + ", Format: " + data[6]);
-                } else {
-                    System.out.println("Unknown book type: " + line);
+                    case "EBook" -> System.out.println("Title: " + data[1] + ", Author: " + data[2] + ", Genre: " + data[3]
+                                + ", ISBN: " + data[4] + ", Format: " + data[6]);
+                    default -> System.out.println("Unknown book type: " + line);
                 }
             }
     
@@ -414,20 +421,11 @@ class Reader extends User {
             System.out.print("Enter your choice: ");
             choice = sc.nextInt();
             switch (choice) {
-                case 1:
-                    viewBooks();
-                    break;
-                case 2:
-                    borrowBook(sc);
-                    break;
-                case 3:
-                    returnBook(sc);
-                    break;
-                case 4:
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("Invalid choice, please try again.");
+                case 1 -> viewBooks();
+                case 2 -> borrowBook(sc);
+                case 3 -> returnBook(sc);
+                case 4 -> System.exit(0);
+                default -> System.out.println("Invalid choice, please try again.");
             }
         } while (choice != 4);
     }
@@ -446,7 +444,8 @@ class Reader extends User {
                     System.out.println("Title: " + data[1] + ", Author: " + data[2] + ", Genre: " + data[3] +
                                        ", ISBN: " + data[4] + ", Pages: " + data[6] +
                                        ", Availability: Available, Type: " + data[0]);
-                } else if (data[0].equals("EBook") && data[5].equals("true")) {
+                } 
+                else if (data[0].equals("EBook") && data[5].equals("true")) {
                     System.out.println("Title: " + data[1] + ", Author: " + data[2] + ", Genre: " + data[3] +
                                        ", ISBN: " + data[4] + ", Format: " + data[6] + ", Type: " + data[0]);
                 }
@@ -486,7 +485,7 @@ class Reader extends User {
                         try (FileWriter filewriter = new FileWriter("transactions.txt", true)) {
                             String transaction = getUsername() + " [ BORROW ] Title: " + data[1] +
                                                  " | ISBN: " + data[4] +
-                                                 " | Date: " + java.time.LocalDate.now();
+                                                 " | Date Borrow: " + java.time.LocalDate.now();
                             filewriter.write(transaction + "\n");
                         } 
                         catch (IOException e) {
@@ -503,11 +502,11 @@ class Reader extends User {
             scanner.close();
     
             if (foundTitle) {
-                FileWriter wr = new FileWriter(bookFile, false);
+                FileWriter writer = new FileWriter(bookFile, false);
                 for (String line : updatedFile) {
-                    wr.write(line + "\n");
+                    writer.write(line + "\n");
                 }
-                wr.close();
+                writer.close();
             } else {
                 System.out.println("Cannot find book ''" + Title + "'' in the file.");
             }
@@ -520,7 +519,7 @@ class Reader extends User {
     
     public void returnBook(Scanner sc) {
         System.out.print("Enter title of book to return: ");
-        sc.nextLine(); // Consume leftover newline
+        sc.nextLine(); 
         String title = sc.nextLine().trim();
     
         File bookFile = new File("books.txt");
@@ -566,14 +565,14 @@ class Reader extends User {
                         System.out.println("You have not borrowed this book or already returned it.");
                     } 
                     else if (data[5].equalsIgnoreCase("false")) {
-                        data[5] = "true"; // Mark as returned
+                        data[5] = "true";
                         isbnToReturn = data[4];
                         System.out.println("You have returned the book ''" + title + "'' successfully.");
-                        try (FileWriter tfw = new FileWriter(transactionFile, true)) {
+                        try (FileWriter filewriter = new FileWriter(transactionFile, true)) {
                             String transaction = getUsername() + " [ RETURN ] Title: " + data[1] +
                                                  " | ISBN: " + isbnToReturn +
-                                                 " | Date: " + java.time.LocalDate.now();
-                            tfw.write(transaction + "\n");
+                                                 " | Date Return: " + java.time.LocalDate.now();
+                            filewriter.write(transaction + "\n");
                         } catch (IOException e) {
                             System.out.println("Error writing to transactions file.");
                         }
@@ -695,12 +694,92 @@ class Ebook extends Book {
     }
 }
 
+class FileHandler {
+    public FileHandler() {
+        // Constructor
+
+    }
+ 
+    public static List<String> readLines(String filename) throws Throwable {
+       List<String> lines = new ArrayList<>();
+ 
+       try {
+          Throwable v2 = null;
+          Object v3 = null;
+ 
+          try {
+             BufferedReader br = new BufferedReader(new FileReader(filename));
+ 
+             String line;
+             try {
+                while((line = br.readLine()) != null) {
+                   lines.add(line);
+                }
+             } 
+             finally {
+                if (br != null) {
+                   br.close();
+                }
+ 
+             }
+          } 
+          catch (Throwable v13) {
+             v2 = v13;
+             throw v2;
+          }
+       } 
+       catch (IOException var14) {
+          System.out.println("File read error: " + filename);
+       }
+        return lines;
+    }
+ 
+    public static void writeLines(String filename, List<String> lines) throws Throwable {
+       try {
+          Throwable v2 = null;
+          Object v3 = null;
+ 
+          try {
+             BufferedWriter br2 = new BufferedWriter(new FileWriter(filename));
+ 
+             try {
+                for (String line : lines) {
+                    br2.write(line);
+                    br2.newLine();
+                }
+             } 
+             finally {
+                if (br2 != null) {
+                    br2.close();
+                }
+ 
+             }
+          } 
+          catch (IOException v14) {
+             if (v2 == null) {
+                v2 = v14;
+             } 
+             else if (v2 != v14) {
+                v2.addSuppressed(v14);
+             }
+ 
+             throw v2;
+          }
+       } 
+       catch (IOException v15) {
+          System.out.println("File write error: " + filename);
+       }
+ 
+    }
+ }
+
 public class Main {
     public static void main(String[] args) {
         System.out.println("--- WELCOME TO LIBRARY MANAGEMENT SYSTEM ---");
         Scanner sc = new Scanner(System.in);
 
         while (true) {
+            System.out.println("Sign In to your account:");
             System.out.print("Enter your username: ");
             String username = sc.nextLine().trim();
             System.out.print("Enter your password: ");
@@ -731,7 +810,7 @@ public class Main {
                     System.out.println("Invalid credentials, Please try again...");
                     System.out.print("Do you want to try again? (yes/no): ");
                     String choice = sc.nextLine().trim().toLowerCase();
-                    if (!choice.equals("y")) {
+                    if (!choice.equals("yes")) {
                         System.out.println("See you next time!");
                         break;
                     }

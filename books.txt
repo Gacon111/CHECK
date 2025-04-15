@@ -1,3 +1,7 @@
 PrintedBook,Book1,Author1,Fiction,ISBN001,false,300
-PrintedBook,Book2,Author2,Science,ISBN002,true,250
-EBook,Book3,Author3,Technology,ISBN003,true,PDFPrintedBook,Book1,Author1,Fiction,ISBN001,true,300
+EBook,Book3,Author3,Technology,ISBN003,true,PDF
+EBook,PeterPan,David,football,ISBN004,true,PDF
+PrintedBook,hello,Daniel,Anime,ISBN005,true,10000
+PrintedBook,Cat,vie,Action,ISBN006,true,200
+PrintedBook,Dance,dine,Movie,ISBN007,false,2000
+PrintedBook,I'm Karen,Karen,Romantic,ISBN002,true,500

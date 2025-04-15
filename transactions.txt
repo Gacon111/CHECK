@@ -1,1 +1,4 @@
-reader [ BORROW ] Title: Book1 | ISBN: ISBN001 | Date: 2025-04-14
+reader [ BORROW ] Title: ChickenTheForest | ISBN: ISBN001 | Date Borrow: 2025-04-15
+reader [ BORROW ] Title: hello | ISBN: ISBN005 | Date Borrow: 2025-04-15
+reader [ RETURN ] Title: hello | ISBN: ISBN005 | Date Return: 2025-04-15
+reader [ BORROW ] Title: Dance | ISBN: ISBN007 | Date Borrow: 2025-04-15
